@@ -15,6 +15,7 @@ import com.android.aim.interfaces.ISocketOperator;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 
 public class SocketOperator implements ISocketOperator
@@ -73,24 +74,38 @@ public class SocketOperator implements ISocketOperator
 	public String sendHttpRequest(Context context, String params)
 	{
 		String result = new String();
-		try {
-	        Socket socket = new Socket(AUTHENTICATION_SERVER_ADDRESS, AUTHENTICATION_SERVER_PORT);
-	        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-	        out.println(params);
-	        
-	        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			String inputLine;
-
-			while ((inputLine = in.readLine()) != null) {
-				result = result.concat(inputLine);				
-			}
-	        
-	    }catch(IOException e){
-	        e.printStackTrace();
-	    }
 		
-		if (result.length() == 0) {
-			result = HTTP_REQUEST_FAILED;
+		try{
+			
+			Log.i("LOGIN", "1");
+			
+			try {
+		        Socket socket = new Socket(AUTHENTICATION_SERVER_ADDRESS, AUTHENTICATION_SERVER_PORT);
+		        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+		        out.println(params);
+		        
+		        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				String inputLine;
+	
+				if ((inputLine = in.readLine()) != null) {
+					result = result.concat(inputLine);
+					Log.i("LOGIN", result);
+				}
+				in.close();
+				socket.close();
+		        
+		    }catch(IOException e){
+		        e.printStackTrace();
+		    }
+			
+			if (result.length() == 0) {
+				result = HTTP_REQUEST_FAILED;
+			}
+		
+			Log.i("LOGIN", result);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
 		}
 		
 		return result;

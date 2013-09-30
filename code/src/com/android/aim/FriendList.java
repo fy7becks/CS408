@@ -88,35 +88,43 @@ public class FriendList extends ListActivity
 		}
 
 		public View getView(int position, View convertView, ViewGroup parent) {
-			// A ViewHolder keeps references to children views to avoid unnecessary calls
-			// to findViewById() on each row.
-			ViewHolder holder;
+			
+			try{
+			
+				// A ViewHolder keeps references to children views to avoid unnecessary calls
+				// to findViewById() on each row.
+				ViewHolder holder;
+	
+				// When convertView is not null, we can reuse it directly, there is no need
+				// to reinflate it. We only inflate a new View when the convertView supplied
+				// by ListView is null.
+				if (convertView == null) 
+				{
+					convertView = mInflater.inflate(R.layout.friend_list_screen, null);
+	
+					// Creates a ViewHolder and store references to the two children views
+					// we want to bind data to.
+					holder = new ViewHolder();
+					holder.text = (TextView) convertView.findViewById(R.id.text);
+					holder.icon = (ImageView) convertView.findViewById(R.id.icon);                                       
+	
+					convertView.setTag(holder);
+				}   
+				else {
+					// Get the ViewHolder back to get fast access to the TextView
+					// and the ImageView.
+					holder = (ViewHolder) convertView.getTag();
+				}
+	
+				// Bind the data efficiently with the holder.
+				holder.text.setText(friends[position].userName);
+				holder.icon.setImageBitmap(friends[position].status == STATUS.ONLINE ? mOnlineIcon : mOfflineIcon);
 
-			// When convertView is not null, we can reuse it directly, there is no need
-			// to reinflate it. We only inflate a new View when the convertView supplied
-			// by ListView is null.
-			if (convertView == null) 
-			{
-				convertView = mInflater.inflate(R.layout.friend_list_screen, null);
-
-				// Creates a ViewHolder and store references to the two children views
-				// we want to bind data to.
-				holder = new ViewHolder();
-				holder.text = (TextView) convertView.findViewById(R.id.text);
-				holder.icon = (ImageView) convertView.findViewById(R.id.icon);                                       
-
-				convertView.setTag(holder);
-			}   
-			else {
-				// Get the ViewHolder back to get fast access to the TextView
-				// and the ImageView.
-				holder = (ViewHolder) convertView.getTag();
 			}
-
-			// Bind the data efficiently with the holder.
-			holder.text.setText(friends[position].userName);
-			holder.icon.setImageBitmap(friends[position].status == STATUS.ONLINE ? mOnlineIcon : mOfflineIcon);
-
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+			
 			return convertView;
 		}
 
@@ -179,44 +187,51 @@ public class FriendList extends ListActivity
 	}
 	public void updateData(FriendInfo[] friends, FriendInfo[] unApprovedFriends)
 	{
-		if (friends != null) {
-			friendAdapter.setFriendList(friends);	
-			setListAdapter(friendAdapter);				
-		}				
+		try{
 		
-		if (unApprovedFriends != null) 
-		{
-			NotificationManager NM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+			if (friends != null) {
+				friendAdapter.setFriendList(friends);	
+				setListAdapter(friendAdapter);				
+			}				
 			
-			if (unApprovedFriends.length >= 0)
-			{					
-				String tmp = new String();
-				for (int j = 1; j < unApprovedFriends.length; j++) {
-					tmp = tmp.concat(unApprovedFriends[j].userName).concat(",");			
-				}
-				NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
-		    	.setSmallIcon(R.drawable.stat_sample)
-		    	.setContentTitle(getText(R.string.new_friend_request_exist));
-
-				Intent i = new Intent(this, UnApprovedFriendList.class);
-				i.putExtra(FriendInfo.FRIEND_LIST, tmp);				
-
-				PendingIntent contentIntent = PendingIntent.getActivity(this, 0, i, 0);
-
-				//mBuilder.setContentText("You have new friend request(s)");
-				
-				mBuilder.setContentIntent(contentIntent);
-
-				
-				NM.notify(R.string.new_friend_request_exist, mBuilder.build());			
-			}
-			else
+			if (unApprovedFriends != null) 
 			{
-				// if any request exists, then cancel it
-				NM.cancel(R.string.new_friend_request_exist);			
+				NotificationManager NM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+				
+				if (unApprovedFriends.length >= 0)
+				{					
+					String tmp = new String();
+					for (int j = 1; j < unApprovedFriends.length; j++) {
+						tmp = tmp.concat(unApprovedFriends[j].userName).concat(",");			
+					}
+					NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+			    	.setSmallIcon(R.drawable.stat_sample)
+			    	.setContentTitle(getText(R.string.new_friend_request_exist));
+	
+					Intent i = new Intent(this, UnApprovedFriendList.class);
+					i.putExtra(FriendInfo.FRIEND_LIST, tmp);				
+	
+					PendingIntent contentIntent = PendingIntent.getActivity(this, 0, i, 0);
+	
+					//mBuilder.setContentText("You have new friend request(s)");
+					
+					mBuilder.setContentIntent(contentIntent);
+	
+					
+					NM.notify(R.string.new_friend_request_exist, mBuilder.build());			
+				}
+				else
+				{
+					// if any request exists, then cancel it
+					NM.cancel(R.string.new_friend_request_exist);			
+				}
 			}
-		}
 
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 

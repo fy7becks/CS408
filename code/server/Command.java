@@ -5,7 +5,6 @@ import com.google.android.gcm.server.MulticastResult;
 import com.google.android.gcm.server.Sender;
 
 public class Command {
-		
 	String s;
 	
 	public Command(String command) {
@@ -71,7 +70,10 @@ public class Command {
 		else {
 			return_result = "Nothing is being requested.";
 		}
-		System.out.println(return_result);
+		System.out.println();
+		String head1="<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+		return_result=head1+return_result;
+		System.out.println("output:"+return_result);
 		return return_result;
 	}
 }

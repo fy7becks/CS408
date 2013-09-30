@@ -93,44 +93,48 @@ public class Login extends Activity {
         
         loginButton.setOnClickListener(new OnClickListener(){
 			public void onClick(View arg0) 
-			{					
-				if (imService == null) {
-					Toast.makeText(getApplicationContext(),R.string.not_connected_to_service, Toast.LENGTH_LONG).show();
-					return;
-				}
-				else if (imService.isNetworkConnected() == false)
-				{
-					Toast.makeText(getApplicationContext(),R.string.not_connected_to_network, Toast.LENGTH_LONG).show();
-				}
-				else if (usernameText.length() >= 0 && 
-					passwordText.length() >= 0)
-				{
-					
-					Thread loginThread = new Thread(){
-						private Handler handler = new Handler();
-						@Override
-						public void run() {
-							String result = null;
-							try {
-								result = imService.authenticateUser(context, usernameText.getText().toString(), passwordText.getText().toString());
-							} catch (UnsupportedEncodingException e) {
+			{
+				try{
+					if (imService == null) {
+						Toast.makeText(getApplicationContext(),R.string.not_connected_to_service, Toast.LENGTH_LONG).show();
+						return;
+					}
+					else if (imService.isNetworkConnected() == false)
+					{
+						Toast.makeText(getApplicationContext(),R.string.not_connected_to_network, Toast.LENGTH_LONG).show();
+					}
+					else if (usernameText.length() >= 0 && 
+						passwordText.length() >= 0)
+					{
+						
+						Thread loginThread = new Thread(){
+							private Handler handler = new Handler();
+							@Override
+							public void run() {
+								String result = null;
+								try {
+//									result = "";
+									result = imService.authenticateUser(context, usernameText.getText().toString(), passwordText.getText().toString());
+								} catch (UnsupportedEncodingException e) {
+									e.printStackTrace();
+								}
 								
-								e.printStackTrace();
-							}
-							if (result.equals(AUTHENTICATION_FAILED)) 
-							{
-								/*
-								 * Authenticatin failed, inform the user
-								 */
-								handler.post(new Runnable(){
-									public void run() {	
-										Toast.makeText(getApplicationContext(),R.string.make_sure_username_and_password_correct, Toast.LENGTH_LONG).show();
-									}									
-								});
-														
-							}
-							else {
-							
+//								if (result == null)
+//									result = "";
+								
+								if (result.equals(AUTHENTICATION_FAILED)) 
+								{
+									/*
+									 * Authenticatin failed, inform the user
+									 */
+									handler.post(new Runnable(){
+										public void run() {	
+											Toast.makeText(getApplicationContext(),R.string.make_sure_username_and_password_correct, Toast.LENGTH_LONG).show();
+										}									
+									});
+															
+								}
+								
 								/*
 								 * if result not equal to authentication failed,
 								 * result is equal to friend list of the user
@@ -143,18 +147,20 @@ public class Login extends Activity {
 								});
 								
 							}
-							
-						}
-					};
-					loginThread.start();
-					
+						};
+						loginThread.start();
+						
+					}
+					else {
+						/*
+						 * Username or Password is not filled, alert the user
+						 */
+						Toast.makeText(getApplicationContext(),R.string.fill_both_username_and_password, Toast.LENGTH_LONG).show();
+					}				
 				}
-				else {
-					/*
-					 * Username or Password is not filled, alert the user
-					 */
-					Toast.makeText(getApplicationContext(),R.string.fill_both_username_and_password, Toast.LENGTH_LONG).show();
-				}				
+				catch (Exception e) {
+					e.printStackTrace();
+				}
 			}       	
         });
         
@@ -237,16 +243,23 @@ public class Login extends Activity {
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 	    
-		switch(item.getItemId()) 
-	    {
-	    	case SIGN_UP_ID:
-	    		Intent i = new Intent(Login.this, SignUp.class);
-	    		startActivity(i);
-	    		return true;
-	    	case EXIT_APP_ID:
-	    		cancelButton.performClick();
-	    		return true;
-	    }
+		try{
+		
+			switch(item.getItemId()) 
+		    {
+		    	case SIGN_UP_ID:
+		    		Intent i = new Intent(Login.this, SignUp.class);
+		    		startActivity(i);
+		    		return true;
+		    	case EXIT_APP_ID:
+		    		cancelButton.performClick();
+		    		return true;
+		    }
+		
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
 	       
 	    return super.onMenuItemSelected(featureId, item);
 	}

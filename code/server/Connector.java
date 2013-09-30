@@ -222,7 +222,7 @@ public class Connector {
 			ip = parts1[i*8+3];
 			id = parts1[i*8];
 			port = parts1[i*8+7];
-			out += "<friend  username = '"+ friendName+"'  status='"+status+"' IP='"+ip+"' userKey = '"+id+"'  port='"+port+"'/>";
+			out += "<friend  username = '"+ friendName+"' status='"+status+"' IP='"+ip+"' userKey = '"+id+"'  port='"+port+"'/>";
 		}
 		String uName, sendt, messagetxt;
 		String[] parts2 = output2.split(":;:");
@@ -230,29 +230,34 @@ public class Connector {
 			uName = parts2[i*8+7];
 			sendt = parts2[i*8+3];
 			messagetxt = parts2[i*8+6];
-			out += "<meesage from='"+uName+ "'sendt='"+sendt+"' text='"+messagetxt+ "' />";
+			out += "<message from='"+uName+ "' sendt='"+sendt+"' text='"+messagetxt+ "' />";
 		}
 		// need to update
-		System.out.println(out);
+		
 		//String result = ResultSetToString(executeQuery(sql));
-
+		out+="</data>";
+		System.out.println(out);
 		return out;
 
 	}
 
-	public boolean sendMessage(String fromUser, String password ,String message, String toUser, String ipaddr){
+	public boolean sendMessage(String fromUser, String password ,String toUser, String message, String ipaddr){
 		String cc=authenticateUser(fromUser, password, ipaddr);
 		if(cc.length()<=0)
 		{
 			return false;
 		}
-
+		
 		String sqlto = " select Id from users where username = '" + toUser + "' limit 1 ;" ;
+		String toUserId = ResultSetToString(executeQuery(sqlto));
+		String sqlfrom = " select Id from users where username = '" + fromUser + "' limit 1 ;" ;
+		String fromUserId = ResultSetToString(executeQuery(sqlfrom));
 		if(execute(sqlto)){
 
-			String sql22 = "INSERT INTO messages (fromuid, touid, sentdt, messagetext) VALUES ("+fromUser+",  "+toUser+", NOW(), '"+message+"');";
+			String sql22 = "INSERT INTO messages (fromuid, touid, sentdt, messagetext) VALUES ("+fromUserId+",  "+toUserId+", NOW(), '"+message+"');";
 //DATE("Y-m-d H:i")	
-			
+			System.out.println("==================================");
+			System.out.println(sql22);
 			return execute(sql22);
 
 		}
@@ -276,6 +281,7 @@ public class Connector {
 		return false;
 	}
 	public boolean addNewFriend(String userName, String password , String friendUserName, String ipaddr){
+
 		String cc=authenticateUser(userName, password, ipaddr);
 		if(cc.length()<=0)
 		{
@@ -283,6 +289,8 @@ public class Connector {
 		}
 
 		String sqlCheck = "select id from users where username = '" +userName+"' and password = '" +password+"' limit 1;";
+
+
 		if(execute(sqlCheck)){
 			String sqlCheckAg = "select id from users where username = '"+ friendUserName+ "' limit 1;";
 			if(execute(sqlCheckAg)){
@@ -358,20 +366,7 @@ public class Connector {
 		System.out.println("query:"+query);
 		return execute(query);
 	}
-	public boolean AddFriend(String user_ID, String target_ID){
-		user_ID = EscapeString(user_ID);
-		String query = "SELECT user_ID from user where user_ID ='"+target_ID+"';";
-		if(ResultSetToString(executeQuery(query)).length()>1){
-			query = "SELECT contact_list from user where user_ID ='"+user_ID+"';";
-			String list=ResultSetToString(executeQuery(query));
-			list=list+":\\*:"+target_ID;
-			query = "UPDATE user set contact_list = '" + list + "' where user_ID = '" + user_ID + "';";
-			return execute(query);
-		}
-		else{
-			return false;
-		}
-	}
+	
 
 
 	public String authenticateUser(String username, String password, String ipaddr)
@@ -385,6 +380,7 @@ public class Connector {
 		if(output.length()>0)
 		{
 			query="update users set authenticationTime = NOW(), IP = '"+ipaddr+"' ,port = 15145 where Id = "+temp[0]+" limit 1";		
+			System.out.println("===query:"+query);
 			if(execute(query))
 			{
 				System.out.println("Update Successfully");
@@ -395,13 +391,14 @@ public class Connector {
 			}
 
 		}
+		System.out.println("id: "+temp[0]);
 		return temp[0];
 	}
 	private String getAddr(String addr)
 	{
 		//System.out.println(addr);
 		String output=addr.subSequence(1, addr.lastIndexOf(":")).toString();
-		//System.out.println("******"+addr);
+		System.out.println("******"+output);
 		return output;
 	}
 	

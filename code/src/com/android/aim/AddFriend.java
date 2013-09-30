@@ -114,20 +114,28 @@ public class AddFriend extends Activity implements OnClickListener {
      }
 
     private void addNewFriend() {
-        if (mFriendUserNameText.length() > 10) {
-            Thread thread = new Thread() {
-                @Override
-                public void run() {
-                    mImService.addNewFriendRequest(context, mFriendUserNameText.getText().toString());
-                }
-            };
-            thread.start();
-
-            Toast.makeText(AddFriend.this, R.string.request_sent, Toast.LENGTH_SHORT).show();
-
-        } else {
-            Log.e(LOG_TAG, "addNewFriend: username length (" + mFriendUserNameText.length() + ") is < 10");
-            Toast.makeText(AddFriend.this, R.string.type_friend_username, Toast.LENGTH_LONG).show();
-        }
+    	
+    	try{
+    	
+	        if (mFriendUserNameText.length() > 10) {
+	            Thread thread = new Thread() {
+	                @Override
+	                public void run() {
+	                    mImService.addNewFriendRequest(context, mFriendUserNameText.getText().toString());
+	                }
+	            };
+	            thread.start();
+	
+	            Toast.makeText(AddFriend.this, R.string.request_sent, Toast.LENGTH_SHORT).show();
+	
+	        } else {
+	            Log.e(LOG_TAG, "addNewFriend: username length (" + mFriendUserNameText.length() + ") is < 10");
+	            Toast.makeText(AddFriend.this, R.string.type_friend_username, Toast.LENGTH_LONG).show();
+	        }
+        
+    	}
+    	catch (Exception e) {
+    		e.printStackTrace();
+    	}
     }
 }

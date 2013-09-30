@@ -83,53 +83,58 @@ public class SignUp extends Activity {
 	        
 	        signUpButton.setOnClickListener(new OnClickListener(){
 				public void onClick(View arg0) 
-				{						
-					if (usernameText.length() >= 0 &&		
-						passwordText.length() >= 0 && 
-						passwordAgainText.length() >= 0 &&
-						eMailText.length() >= 0
-						)
-					{
-							
-						Thread thread = new Thread(){
-							String result = new String();
-							@Override
-							public void run() {
-								result = imService.signUpUser(context, usernameText.getText().toString(), 
-										passwordText.getText().toString(), 
-										eMailText.getText().toString());
-
-								handler.post(new Runnable(){
-
-									public void run() {
-										if (result.equals(SERVER_RES_RES_SIGN_UP_SUCCESFULL)) {
-											Toast.makeText(getApplicationContext(),R.string.signup_successfull, Toast.LENGTH_LONG).show();
+				{
+					try{
+						if (usernameText.length() >= 0 &&		
+							passwordText.length() >= 0 && 
+							passwordAgainText.length() >= 0 &&
+							eMailText.length() >= 0
+							)
+						{
+								
+							Thread thread = new Thread(){
+								String result = new String();
+								@Override
+								public void run() {
+									result = imService.signUpUser(context, usernameText.getText().toString(), 
+											passwordText.getText().toString(), 
+											eMailText.getText().toString());
+	
+									handler.post(new Runnable(){
+	
+										public void run() {
+											if (result.equals(SERVER_RES_RES_SIGN_UP_SUCCESFULL)) {
+												Toast.makeText(getApplicationContext(),R.string.signup_successfull, Toast.LENGTH_LONG).show();
+											}
+											else if (result.equals(SERVER_RES_SIGN_UP_USERNAME_CRASHED)){
+												Toast.makeText(getApplicationContext(),R.string.signup_username_crashed, Toast.LENGTH_LONG).show();
+											}
+											else
+											{
+												Toast.makeText(getApplicationContext(),R.string.signup_failed, Toast.LENGTH_LONG).show();
+											}			
 										}
-										else if (result.equals(SERVER_RES_SIGN_UP_USERNAME_CRASHED)){
-											Toast.makeText(getApplicationContext(),R.string.signup_username_crashed, Toast.LENGTH_LONG).show();
-										}
-										else
-										{
-											Toast.makeText(getApplicationContext(),R.string.signup_failed, Toast.LENGTH_LONG).show();
-										}			
-									}
-
-								});
-							}
-
-						};
-						thread.start();
+	
+									});
+								}
+	
+							};
+							thread.start();
+						}
+						else {
+							Toast.makeText(getApplicationContext(),R.string.signup_fill_all_fields, Toast.LENGTH_LONG).show();
+						}
 					}
-					else {
-						Toast.makeText(getApplicationContext(),R.string.signup_fill_all_fields, Toast.LENGTH_LONG).show();
-					}				
+					catch (Exception e) {
+						
+					}
 				}       	
 	        });
 	        
 	        cancelButton.setOnClickListener(new OnClickListener(){
 				public void onClick(View arg0) 
 				{						
-					finish();					
+										
 				}	        	
 	        });
 	        

@@ -54,6 +54,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 public class IMService extends Service implements IAppManager, IUpdateData {
 	
@@ -63,7 +64,7 @@ public class IMService extends Service implements IAppManager, IUpdateData {
 	public static final String MESSAGE_LIST_UPDATED = "Take Message List";
 	public ConnectivityManager conManager = null; 
 	private final int UPDATE_TIME_PERIOD = 15000;
-	private String rawFriendList = new String();
+	private String rawFriendList = new String("123");
 	private String rawMessageList = new String();
 
 	ISocketOperator socketOperator = new SocketOperator(this);
@@ -189,9 +190,11 @@ public class IMService extends Service implements IAppManager, IUpdateData {
 		// after authentication, server replies with friendList xml
 		
 		 rawFriendList = socketOperator.sendHttpRequest(context, getAuthenticateUserParams(username, password));
+		 
 		 if (rawFriendList != null) {
 			 this.parseFriendInfo(rawFriendList);
 		 }
+		 
 		 return rawFriendList;
 	}
 	
@@ -218,15 +221,16 @@ public class IMService extends Service implements IAppManager, IUpdateData {
 		this.authenticatedUser = false;
 		
 		String result = this.getFriendList(context);
+		
+		if (result == null)
+			rawFriendList = "";
+		
 		if (!result.equals(Login.AUTHENTICATION_FAILED)) 
 		{			
 			// if user is authenticated then return string from server is not equal to AUTHENTICATION_FAILED
 			this.authenticatedUser = true;
 			
-			if (result == null)
-				rawFriendList = "";
-			else
-				rawFriendList = result;
+			rawFriendList = result;
 			
 			USERNAME = this.username;
 			Intent i = new Intent(FRIEND_LIST_UPDATED);					
@@ -403,7 +407,7 @@ public class IMService extends Service implements IAppManager, IUpdateData {
 		{
 			SAXParser sp = SAXParserFactory.newInstance().newSAXParser();
 			sp.parse(new ByteArrayInputStream(xml.getBytes()), new XMLHandler(IMService.this));		
-		} 
+		}
 		catch (ParserConfigurationException e) {			
 			e.printStackTrace();
 		}

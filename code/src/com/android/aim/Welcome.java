@@ -15,15 +15,25 @@ public class Welcome extends Activity {
 	}
 	
 	public void startSignUp(View v){
-		Intent signup = new Intent(this, SignUp.class);
-		startActivity(signup);
-		finish();
+		try{
+			Intent signup = new Intent(this, SignUp.class);
+			startActivity(signup);
+			finish();
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void startLogin(View v){
-		Intent login = new Intent(this, Login.class);
-		startActivity(login);
-		finish();
+		try{
+			Intent login = new Intent(this, Login.class);
+			startActivity(login);
+			finish();
+		}
+		catch (Exception e) {
+			
+		}
 	}
 
 	@Override
